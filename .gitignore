@@ -1,0 +1,9 @@
+# Survey exports must never be committed: this repository is public.
+*.xlsx
+*.xlsm
+*.xls
+*.csv
+*.json
+~$*
+.DS_Store
+Thumbs.db

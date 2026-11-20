@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FA49 ORSA Skill Set: Survey Findings and Recommendations</title>
+<link rel="stylesheet" href="../fonts/fonts.css">
+<style>
+/* Slide canvas defaults (match the Slides editor) */
+* { margin: 0 }
+body { font: 32px/1.2 sans-serif }
+h1 { font-size: 96px; font-weight: 600 }
+h2 { font-size: 64px; font-weight: 600 }
+h3 { font-size: 44px; font-weight: 600 }
+p, li, h1, h2, h3, td, th { overflow-wrap: break-word; text-wrap: pretty }
+table { width: 100%; border-collapse: separate; border-spacing: 0; border: solid #0003; border-width: 2px 0 0 2px }
+th, td { padding: .35em .6em; text-align: left; border: solid #0003; border-width: 0 2px 2px 0 }
+/* Deck styles */
+:root {
+  --dark: #17211C;
+  --light: #F3F1EA;
+  --light2: #E6E2D4;
+  --gold: #C9973A;
+  --gold-ink: #7A5A1C;
+  --blue: #2F5D7C;
+  --orange: #C2622A;
+  --muted: #4A544D;
+  --muted-d: #C9D1C8;
+}
+
+body { font-family: 'Public Sans', Arial, sans-serif; color: #17211C; }
+
+section {
+  padding: 128px 128px 160px;
+  background: #F3F1EA;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  counter-increment: page;
+}
+section.alt { background: #E6E2D4; }
+section.dark { background: #17211C; color: #F3F1EA; }
+section.accent { background: #C9973A; color: #17211C; }
+section.cover { padding: 128px; justify-content: flex-end; gap: 32px; }
+
+h1 { font-family: 'Oswald', Arial, sans-serif; font-size: 120px; font-weight: 600; line-height: 1.05; color: #F3F1EA; }
+h2 { font-family: 'Oswald', Arial, sans-serif; font-size: 72px; font-weight: 600; line-height: 1.1; color: #17211C; }
+h3 { font-family: 'Public Sans', Arial, sans-serif; font-size: 40px; font-weight: 700; line-height: 1.2; color: #17211C; }
+p { font-size: 28px; line-height: 1.4; }
+
+.eyebrow { font-size: 24px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #7A5A1C; }
+.dark .eyebrow { color: #C9973A; }
+.lede { font-size: 28px; line-height: 1.4; color: #4A544D; max-width: 1400px; }
+.dark .lede { color: #C9D1C8; }
+.meta { font-size: 24px; color: #C9D1C8; }
+.small { font-size: 24px; color: #4A544D; }
+.rule { width: 160px; height: 8px; background: #C9973A; }
+
+.foot { position: absolute; left: 128px; bottom: 64px; width: 1480px; font-size: 24px; line-height: 1.3; color: #4A544D; }
+.pn { position: absolute; left: 1672px; bottom: 64px; width: 120px; font-size: 24px; text-align: right; color: #4A544D; }
+.pn::after { content: counter(page); }
+.dark .foot, .dark .pn { color: #C9D1C8; }
+
+.cards { display: flex; gap: 32px; }
+.card { flex: 1; background: #E6E2D4; padding: 40px; display: flex; flex-direction: column; gap: 16px; border-top: 8px solid #2F5D7C; }
+.alt .card { background: #F3F1EA; }
+.card.o { border-top: 8px solid #C2622A; }
+.card.g { border-top: 8px solid #C9973A; }
+.card .body { font-size: 28px; color: #4A544D; }
+.big { font-family: 'Oswald', Arial, sans-serif; font-size: 120px; font-weight: 600; line-height: 1; color: #2F5D7C; }
+.big.o { color: #A84F1E; }
+.big.g { color: #7A5A1C; }
+
+.stats { display: flex; gap: 48px; }
+.stat { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.stat .label { font-size: 24px; color: #4A544D; }
+
+.cols { display: flex; gap: 64px; }
+.col { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+.line { font-size: 28px; color: #17211C; }
+
+.chart { display: flex; flex-direction: column; gap: 12px; }
+.crow { display: flex; align-items: center; gap: 32px; }
+.clabel { width: 300px; font-size: 28px; font-weight: 600; }
+.ctrack { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.bar { height: 14px; }
+.bar.t { background: #2F5D7C; }
+.bar.n { background: #C2622A; }
+.cval { width: 340px; font-size: 24px; color: #4A544D; }
+
+.mrow { display: flex; align-items: center; gap: 24px; }
+.mnum { font-family: 'Oswald', Arial, sans-serif; font-size: 72px; font-weight: 600; line-height: 1; width: 110px; color: #2F5D7C; }
+.mnum.o { color: #A84F1E; }
+.mlab { font-size: 28px; color: #17211C; }
+
+.tbl { width: 100%; font-size: 24px; color: #17211C; }
+.tbl th { font-weight: 700; }
+.tbl .hl { background: #E6E2D4; }
+
+.pills { display: flex; flex-wrap: wrap; gap: 16px; }
+.pill { font-size: 24px; background: #E6E2D4; padding: 12px 24px; border-radius: 999px; }
+.tag { font-size: 24px; font-weight: 700; padding: 8px 20px; border-radius: 8px; width: 140px; text-align: center; background: #17211C; color: #F3F1EA; }
+.tag.o { background: #A84F1E; }
+.tag.b { background: #2F5D7C; }
+.tag.g { background: #C9973A; color: #17211C; }
+.trow { display: flex; align-items: flex-start; gap: 32px; }
+.trow .txt { flex: 1; font-size: 28px; }
+
+.statement { font-family: 'Oswald', Arial, sans-serif; font-size: 120px; font-weight: 600; line-height: 1.05; color: #17211C; max-width: 1500px; }
+.accent .lede { color: #17211C; font-size: 40px; }
+.accent .eyebrow { color: #17211C; }
+
+.steps { font-size: 28px; line-height: 1.4; color: #17211C; }
+.steps li { margin-top: 16px; }
+
+.rise { animation: rise 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 120ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(24px); } }
+
+section.accent { justify-content: center; }
+.card.tight { gap: 8px; }
+
+.dark h2 { color: #F3F1EA; }
+.dark .pill { background: #2A3830; color: #F3F1EA; }
+section.nofoot { padding: 128px; }
+
+.issues { display: flex; flex-direction: column; gap: 32px; }
+.issue { display: flex; align-items: flex-start; gap: 40px; }
+.inum { font-family: 'Oswald', Arial, sans-serif; font-size: 72px; font-weight: 600; line-height: 1; width: 80px; color: #7A5A1C; }
+.itext { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.iq { font-size: 28px; font-weight: 600; color: #17211C; }
+.idata { font-size: 24px; color: #4A544D; }
+
+.card ul { font-size: 24px; line-height: 1.4; color: #4A544D; padding-left: 32px; }
+.card li { margin-top: 8px; }
+.stepn { font-size: 24px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #7A5A1C; }
+
+.col.l { flex: 2; }
+.col.r { flex: 3; }
+.rlist { font-size: 24px; line-height: 1.4; color: #17211C; padding-left: 32px; }
+.rlist li { margin-top: 12px; }
+.tierrow { display: flex; align-items: flex-start; gap: 20px; }
+.tierrow .tag { width: 190px; }
+.ttxt { flex: 1; font-size: 24px; line-height: 1.4; color: #17211C; }
+
+/* Web viewer */
+html, body { height: 100%; background: #0E1411; overflow: hidden }
+.stage { position: fixed; inset: 0 0 56px 0; display: flex; align-items: center; justify-content: center }
+.stage > section { width: 1920px; height: 1080px; box-sizing: border-box; position: absolute; left: 50%; top: 50%; overflow: hidden; display: none; isolation: isolate; transform-origin: center center }
+.stage > section.cur { display: flex }
+aside { display: none }
+.pn::after { content: none }
+.navbar { position: fixed; left: 0; right: 0; bottom: 0; height: 56px; display: flex; align-items: center; gap: 12px; padding: 0 16px; background: #17211C; color: #F3F1EA; font: 15px/1.2 'Public Sans', Arial, sans-serif }
+.navbar button, .navbar a { font: inherit; font-weight: 600; background: transparent; color: #F3F1EA; border: 1px solid #4A544D; border-radius: 6px; padding: 7px 12px; cursor: pointer; text-decoration: none }
+.navbar button:hover, .navbar a:hover { border-color: #C9973A }
+.navbar .count { min-width: 64px; text-align: center }
+.navbar .sp { flex: 1 }
+.notes { position: fixed; left: 0; right: 0; bottom: 56px; max-height: 34vh; overflow: auto; background: #F3F1EA; color: #17211C; font: 16px/1.5 'Public Sans', Arial, sans-serif; padding: 14px 20px; border-top: 4px solid #C9973A; display: none }
+.notes.on { display: block }
+@media print {
+  @page { size: 1920px 1080px; margin: 0 }
+  html, body { height: auto; overflow: visible; background: none }
+  .navbar, .notes { display: none !important }
+  .stage { position: static; display: block }
+  .stage > section { display: flex !important; position: relative; left: 0; top: 0; transform: none !important; page-break-after: always; break-after: page }
+  .rise { animation: none !important }
+}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+<section data-n="1" id="problem" class="dark" data-transition="fade">
+<p class="meta">FA49 ORSA Skill Set Study · [Presenter name, organization] · November 2026</p>
+<p class="eyebrow">1 · Problem statement</p>
+<h2 class="rise" style="--i:0">Does ORSA training prepare officers for the jobs they actually get?</h2>
+<p class="lede rise" style="--i:1">DA PAM 600-3 expects every FA49 officer to be a subject matter expert in eight skill areas, whatever the assignment. The Army does not know whether initial training, through graduate school (ACS) or ORSA-MAC, builds the skills first assignments need, or whether the list still reflects how ORSAs and data scientists work today.</p>
+<div class="pills rise" style="--i:2">
+<p class="pill">Studies and assessments</p>
+<p class="pill">Modeling and simulations</p>
+<p class="pill">Optimization</p>
+<p class="pill">Forecasting</p>
+<p class="pill">Data science</p>
+<p class="pill">Data analytics</p>
+<p class="pill">Data visualization</p>
+<p class="pill">Other big data specialties</p>
+</div>
+<p class="foot">The eight required skill areas. Source: Smartbook DA PAM 600-3, FA49 section, 1 June 2021</p>
+<p class="pn">1</p>
+<aside>The FA49 section of the DA PAM 600-3 Smartbook lists eight areas in which every ORSA serves as a subject matter expert, with no difference by assignment. Officers qualify either through ORSA-MAC or an approved master’s degree. This study asks whether that training matches what first assignments need, and whether the list itself should change.</aside>
+</section>
+<section data-n="2" id="issues">
+<p class="eyebrow">2 · Study issues</p>
+<h2>Four questions this study answers</h2>
+<div class="issues">
+<div class="issue rise" style="--i:0"><p class="inum">1</p><div class="itext"><p class="iq">How well did training and education prepare FA49 officers for their first ORSA assignment?</p><p class="idata">Data: overall agreement rating and officers’ explanations</p></div></div>
+<div class="issue rise" style="--i:1"><p class="inum">2</p><div class="itext"><p class="iq">Which listed skills did first assignments need, and where did training miss?</p><p class="idata">Data: nine skill ratings, recoded into trained vs. needed</p></div></div>
+<div class="issue rise" style="--i:2"><p class="inum">3</p><div class="itext"><p class="iq">Do results differ by training path (ACS, ORSA-MAC, both) and by type of first assignment?</p><p class="idata">Data: comparisons across training path, assignment, degree and degree requirement</p></div></div>
+<div class="issue rise" style="--i:3"><p class="inum">4</p><div class="itext"><p class="iq">What should be added to, or removed from, the FA49 skill list?</p><p class="idata">Data: free-text answers, working group feedback, DA PAM 600-3, civilian ORSA and data science practice</p></div></div>
+</div>
+<p class="pn">2</p>
+<aside>Issues 1 to 3 are answered directly from the survey. Issue 4 combines the survey’s free-text answers with our working group’s feedback and a comparison against how operations research and data science work in the civilian sector.</aside>
+</section>
+<section data-n="3" id="cla" class="alt">
+<p class="eyebrow">3 · Constraints, limitations and assumptions</p>
+<h2>What bounds these findings</h2>
+<div class="cards">
+<div class="card rise" style="--i:0">
+<h3>Constraints</h3>
+<ul>
+<li>Survey questions were already fielded and could not be changed</li>
+<li>Voluntary, self-selected respondents</li>
+<li>The FA49 Smartbook section (June 2021) is the latest available</li>
+<li>No access to job performance records</li>
+</ul>
+</div>
+<div class="card o rise" style="--i:1">
+<h3>Limitations</h3>
+<ul>
+<li>57 responses; some groups as small as 4</li>
+<li>Self-reported, looking back on the first job</li>
+<li>Skip logic hid the ACS skills question from all 11 NPS and AFIT graduates</li>
+<li>Free-text themes coded once, not independently checked</li>
+<li>Two responses took under 15 seconds; kept in</li>
+</ul>
+</div>
+<div class="card g rise" style="--i:2">
+<h3>Assumptions</h3>
+<ul>
+<li>Respondents are broadly representative of FA49 officers</li>
+<li>“Well trained” self-ratings reflect real preparation</li>
+<li>First-assignment needs are a fair test of the skill list</li>
+<li>Civilian ORSA and data science practice is a relevant benchmark</li>
+</ul>
+</div>
+</div>
+<p class="pn">3</p>
+<aside>The biggest limitation is size: 57 responses, so comparisons between small groups such as combat analysts or technical-domain analysts are directional only. The NPS and AFIT skip-logic gap means the graduate-school skills question undercounts those two schools. None of this changes the overall pattern, but it is why the recommendations include a second, corrected survey wave.</aside>
+</section>
+<section data-n="4" id="method">
+<p class="eyebrow">4 · Methodology</p>
+<h2>Survey, measure, compare, then benchmark</h2>
+<div class="cards">
+<div class="card rise" style="--i:0">
+<p class="stepn">Step 1</p>
+<h3>Collect</h3>
+<ul>
+<li>Survey of 57 FA49 officers, four waves, Nov 2024 to Oct 2025</li>
+<li>Nine skill ratings, five answer choices each</li>
+<li>Training path, degree, first job; three free-text questions</li>
+</ul>
+</div>
+<div class="card rise" style="--i:1">
+<p class="stepn">Step 2</p>
+<h3>Measure</h3>
+<ul>
+<li>Answer counts for every question</li>
+<li>Skill answers recoded into trained and needed</li>
+<li>Gaps: needed but not trained; trained but not used</li>
+<li>Data-quality checks</li>
+</ul>
+</div>
+<div class="card rise" style="--i:2">
+<p class="stepn">Step 3</p>
+<h3>Compare</h3>
+<ul>
+<li>By training path: ACS, ORSA-MAC, both</li>
+<li>By first assignment and degree</li>
+<li>By the degree’s final requirement (thesis, capstone, coursework)</li>
+</ul>
+</div>
+<div class="card g rise" style="--i:3">
+<p class="stepn">Step 4</p>
+<h3>Synthesize</h3>
+<ul>
+<li>Theme free-text answers</li>
+<li>Benchmark against DA PAM 600-3 and civilian practice (BLS, INFORMS)</li>
+<li>Add working group input</li>
+<li>Build a tiered skill framework</li>
+</ul>
+</div>
+</div>
+<p class="foot">Civilian sources: BLS Occupational Outlook Handbook (operations research analysts, data scientists); INFORMS analytics job task analysis</p>
+<p class="pn">4</p>
+<aside>Each skill rating had five answers. “Trained” means the officer said they were well trained. “Needed” combines well trained and needed, learned it on the job, and not trained with a negative effect on performance. Comparing the two gives the gap measures used in the results. The working group’s seven requested skills were added at the synthesis step.</aside>
+</section>
+<section data-n="5" id="results" class="nofoot">
+<p class="eyebrow">5 · Results and recommendations</p>
+<h2>Training mostly works; the skill list needs tiers</h2>
+<div class="cols">
+<div class="col l rise" style="--i:0">
+<h3>Results</h3>
+<ul class="rlist">
+<li><b>82%</b> say training prepared them; only 3 of 57 disagree.</li>
+<li><b>Over-taught:</b> 22 officers trained in optimization and 19 in M&amp;S never needed it.</li>
+<li><b>Under-taught:</b> 59% of those who needed assessments learned it on the job.</li>
+<li><b>Needed by nearly all:</b> data communication (95%) and data analysis (88%).</li>
+<li><b>Paths differ:</b> 80% of ORSA-MAC vs. 37% of ACS graduates felt ready for studies and assessments.</li>
+<li><b>Jobs differ:</b> instructors most satisfied (5.6 of 6), combat analysts least (4.6).</li>
+</ul>
+</div>
+<div class="col r rise" style="--i:1">
+<h3>Recommendations</h3>
+<div class="tierrow"><p class="tag b">Foundation</p><p class="ttxt">All ORSAs, day one: problem framing, data collection and surveys, statistics, SQL and Army data platforms, programming, basic apps and dashboards, AI literacy, operations assessment, communication and teaching</p></div>
+<div class="tierrow"><p class="tag">Core</p><p class="ttxt">Working proficiency: cost-benefit analysis, optimization, applied M&amp;S, predictive modeling, decision analysis</p></div>
+<div class="tierrow"><p class="tag o">Specialty</p><p class="ttxt">One or two, by assignment: AI/ML and agentic AI, app development, data engineering and cloud, campaign assessment, large-scale M&amp;S, PPBE</p></div>
+<ul class="rlist">
+<li>Remove “other big data specialties”; merge forecasting into predictive modeling; recast studies as problem framing.</li>
+<li>Add an assessments bridge for ACS-only graduates; require a thesis or capstone.</li>
+<li>Field a second survey wave on the new skills, with the skip logic fixed.</li>
+</ul>
+</div>
+</div>
+<p class="pn">5</p>
+<aside>Results answer study issues 1 to 3; the recommendations answer issue 4. The three tiers keep the classic OR methods but stop expecting every officer to be an expert in all of them. The working group’s items appear in every tier: data platforms, surveys, apps, AI literacy and operations assessment in the foundation; cost-benefit analysis and M&amp;S in the core; agentic AI, app development and campaign assessment as specialties. Survey and working group disagree on M&amp;S: the survey shows it is often taught but unused, the group wants more. Keeping applied M&amp;S in the core and deep M&amp;S as a specialty covers both, and the second survey wave should test it.</aside>
+</section>
+</div>
+<div class="notes" id="notes" aria-live="polite"></div>
+<div class="navbar">
+  <a href="../">← Home</a>
+  <button id="prev" aria-label="Previous slide">‹ Prev</button>
+  <span class="count" id="count"></span>
+  <button id="next" aria-label="Next slide">Next ›</button>
+  <span class="sp"></span>
+  <button id="notesBtn">Speaker notes</button>
+  <button id="fsBtn">Full screen</button>
+  <button id="printBtn">Print / save PDF</button>
+</div>
+<script>
+(() => {
+  const S = [...document.querySelectorAll('.stage > section')];
+  let i = 0;
+  const fit = () => {
+    const st = document.getElementById('stage').getBoundingClientRect();
+    const k = Math.min(st.width / 1920, st.height / 1080) * 0.98;
+    S.forEach((s) => { s.style.transform = `translate(-50%, -50%) scale(${k})`; });
+  };
+  const show = (n) => {
+    i = Math.max(0, Math.min(S.length - 1, n));
+    S.forEach((s, j) => s.classList.toggle('cur', j === i));
+    document.getElementById('count').textContent = `${i + 1} / ${S.length}`;
+    const a = S[i].querySelector('aside');
+    document.getElementById('notes').textContent = a ? a.textContent : '';
+    if (location.hash !== '#slide-' + (i + 1)) history.replaceState(null, '', '#slide-' + (i + 1));
+  };
+  const fromHash = () => { const m = location.hash.match(/^#slide-(\d+)$/); return m ? +m[1] - 1 : 0; };
+  document.getElementById('prev').onclick = () => show(i - 1);
+  document.getElementById('next').onclick = () => show(i + 1);
+  document.getElementById('notesBtn').onclick = () => document.getElementById('notes').classList.toggle('on');
+  document.getElementById('fsBtn').onclick = () => { const d = document.documentElement; (document.fullscreenElement ? document.exitFullscreen() : d.requestFullscreen && d.requestFullscreen()).catch?.(() => {}); };
+  document.getElementById('printBtn').onclick = () => window.print();
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); show(i + 1); }
+    else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); show(i - 1); }
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(S.length - 1);
+    else if (e.key === 'n' || e.key === 'N') document.getElementById('notes').classList.toggle('on');
+  });
+  document.getElementById('stage').addEventListener('click', (e) => { if (!e.target.closest('a')) show(i + (e.clientX > innerWidth / 3 ? 1 : -1)); });
+  addEventListener('resize', fit);
+  addEventListener('hashchange', () => show(fromHash()));
+  fit(); show(fromHash());
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FA49 ORSA Skills Survey Analyzer</title>
+<link rel="stylesheet" href="../fonts/fonts.css">
+<script src="xlsx.full.min.js"></script>
+<script>window.ORSA_STANDALONE = true;</script>
+<style>
+:root{--dark:#17211C;--light:#F3F1EA;--light2:#E6E2D4;--card:#FBFAF6;--gold:#C9973A;--gold-ink:#7A5A1C;--blue:#2F5D7C;--orange:#C2622A;--orange-ink:#A84F1E;--muted:#4A544D;--line:#D5D0C0;--bad:#9B2C2C}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Public Sans',Arial,sans-serif;background:var(--light);color:var(--dark);font-size:15px;line-height:1.45}
+header{background:var(--dark);color:var(--light);padding:22px 32px 18px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+header h1{font-family:'Oswald',Arial,sans-serif;font-weight:600;font-size:30px;margin:0;letter-spacing:.3px}
+header .sub{color:#C9D1C8;font-size:14px;margin-top:4px}
+.status{font-size:13px;color:#C9D1C8;text-align:right}
+.status b{color:var(--gold)}
+main{max-width:1240px;margin:0 auto;padding:24px 32px 64px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:18px}
+.drop{border:2px dashed #B9B29D;border-radius:10px;padding:22px;text-align:center;background:var(--card);cursor:pointer;transition:background .15s,border-color .15s}
+.drop.over{background:#EFE7D2;border-color:var(--gold)}
+.drop strong{font-size:16px}
+.drop .hint{color:var(--muted);font-size:13px;margin-top:4px}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin:6px 0 14px}
+label.ctl{display:flex;flex-direction:column;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--gold-ink);gap:4px}
+select,input[type=search]{font:inherit;font-size:14px;padding:7px 10px;border:1px solid #B9B29D;border-radius:6px;background:#fff;color:var(--dark);min-width:160px}
+button{font:inherit;font-size:14px;font-weight:600;padding:8px 14px;border-radius:6px;border:1px solid var(--dark);background:var(--dark);color:var(--light);cursor:pointer}
+button.ghost{background:transparent;color:var(--dark)}
+button.warn{background:var(--bad);border-color:var(--bad)}
+button:disabled{opacity:.5;cursor:default}
+nav.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:2px solid var(--line);margin-bottom:18px}
+nav.tabs button{background:transparent;color:var(--muted);border:none;border-bottom:3px solid transparent;border-radius:0;padding:10px 14px;margin-bottom:-2px}
+nav.tabs button.on{color:var(--dark);border-bottom-color:var(--gold)}
+h2{font-family:'Oswald',Arial,sans-serif;font-weight:600;font-size:22px;margin:0 0 10px}
+h3{font-size:15px;margin:0 0 8px}
+.note{color:var(--muted);font-size:13px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--blue);border-radius:8px;padding:14px 16px}
+.kpi .v{font-family:'Oswald',Arial,sans-serif;font-size:36px;font-weight:600;line-height:1.05}
+.kpi .l{font-size:13px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:18px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;background:var(--light)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar{height:10px;background:#E3DFD2;border-radius:5px;overflow:hidden;min-width:80px}
+.bar span{display:block;height:100%;background:var(--blue)}
+.bar.o span{background:var(--orange)}
+.pair{display:flex;flex-direction:column;gap:3px;min-width:160px}
+.findings li{margin-bottom:6px}
+.legend{display:flex;gap:18px;font-size:13px;color:var(--muted);margin:4px 0 10px}
+.sw{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.heat td.cell{text-align:center;font-variant-numeric:tabular-nums;font-weight:600}
+.dim{opacity:.55}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
+.chip{font-size:13px;font-weight:600;padding:5px 11px;border-radius:999px;border:1px solid #B9B29D;background:#fff;color:var(--dark);cursor:pointer}
+.chip.on{background:var(--gold);border-color:var(--gold)}
+.resp{border-left:4px solid var(--gold);background:var(--card);padding:10px 14px;margin-bottom:10px;border-radius:0 8px 8px 0}
+.resp .meta{font-size:12px;color:var(--muted);margin-bottom:4px}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;background:var(--light2);margin-right:6px}
+.qc{display:flex;gap:14px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.qc .n{font-family:'Oswald',Arial,sans-serif;font-size:26px;min-width:44px;text-align:right;color:var(--blue)}
+.qc .n.hot{color:var(--orange-ink)}
+.ids{font-size:12px;color:var(--muted);word-break:break-word}
+.msg{padding:10px 14px;border-radius:8px;background:#EFE7D2;margin-bottom:14px}
+.msg.err{background:#F4DCDC}
+.empty{text-align:center;color:var(--muted);padding:40px 10px}
+@media (max-width:640px){main{padding:16px}header{padding:18px 16px}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>FA49 ORSA Skills Survey Analyzer</h1><div class="sub"><a href="../" style="color:#C9973A">← Home</a> · Load Microsoft Forms exports to trend results across survey waves</div></div>
+  <div class="status" id="status">Files are read in this browser and never uploaded</div>
+</header>
+<main>
+  <div id="msg"></div>
+  <div class="drop" id="drop" tabindex="0" role="button" aria-label="Upload a survey export">
+    <strong>Drop survey exports here, or click to choose files</strong>
+    <div class="hint">.xlsx, .xlsm or .csv from Microsoft Forms. Files stay on this computer: nothing is sent to any server. Add several files to combine waves; repeated responses are counted once.</div>
+    <input type="file" id="file" accept=".xlsx,.xlsm,.xls,.csv" multiple hidden>
+  </div>
+  <div id="pending"></div>
+  <div class="controls" id="controls"></div>
+  <nav class="tabs" id="tabs"></nav>
+  <section id="content"></section>
+</main>
+<script>
+/* ===== Survey analysis core (pure functions, no DOM) ===== */
+const Core = (() => {
+  const clean = (s) => String(s == null ? '' : s).replace(/ /g, ' ').replace(/\s+/g, ' ').trim();
+
+  const ROLE_LABEL = {
+    id: 'Response ID', start: 'Start time', end: 'Completion time', pii: 'Name/email (not stored)', ignore: 'Ignored',
+    skill: 'Skill rating', path: 'Training path', degree: 'Graduate degree', otherField: 'Other approved field',
+    cost: 'Cost category / school', school: 'Graduate school name', culminating: 'Degree final requirement',
+    acs: 'ACS prepared me for (multi-select)', mac: 'ORSA-MAC prepared me for (multi-select)',
+    add: 'Skills to add (free text)', remove: 'Skills to remove (free text)', agree: 'Overall preparation rating',
+    explain: 'Rating explanation (free text)', assignment: 'First assignment', other: 'Not recognized',
+  };
+
+  function roleOf(h) {
+    const s = clean(h).toLowerCase();
+    if (s === 'id') return 'id';
+    if (s === 'start time') return 'start';
+    if (s === 'completion time') return 'end';
+    if (s === 'email' || s === 'name' || s === 'email address') return 'pii';
+    if (s.startsWith('last modified time')) return 'ignore';
+    if (s.includes('best reflects your educational training')) return 'skill';
+    if (s.includes('training and qualification')) return 'path';
+    if (s.includes('graduate degree program')) return 'degree';
+    if (s.includes('other operations research related field')) return 'otherField';
+    if (s.includes('cost category')) return 'cost';
+    if (s.includes('graduate school institution')) return 'school';
+    if (s.includes('culminating')) return 'culminating';
+    if (s.startsWith('acs prepared me')) return 'acs';
+    if (s.startsWith('orsa-mac prepared me')) return 'mac';
+    if (s.includes('should be added')) return 'add';
+    if (s.includes('should be removed')) return 'remove';
+    if (s.startsWith('my training and education prepared me')) return 'agree';
+    if (s.startsWith('explain your agreement')) return 'explain';
+    if (s.includes('which option best describes your first')) return 'assignment';
+    return 'other';
+  }
+
+  function skillName(h) {
+    const s = clean(h);
+    const m = s.match(/ability to\s+(.*)$/i);
+    let t = (m ? m[1] : s).replace(/[.?\s]+$/, '').replace(/^(conduct|perform)\s+/i, '');
+    if (/communicate effectively with data/i.test(t)) return 'Data communication';
+    if (/big data/i.test(t)) return 'Big data specialties';
+    return t.charAt(0).toUpperCase() + t.slice(1);
+  }
+
+  const CODES = ['WTpos', 'WTnn', 'OJT', 'NWTnn', 'NEG'];
+  const CODE_LABEL = {
+    WTpos: 'Well trained, needed, helped', WTnn: 'Well trained, not needed', OJT: 'Not trained, learned on the job',
+    NWTnn: 'Not trained, not needed', NEG: 'Not trained, needed, hurt performance',
+  };
+  function codeSkill(v) {
+    const s = clean(v).toLowerCase();
+    if (!s) return null;
+    if (s.includes('negatively')) return 'NEG';
+    if (s.includes('learned the skill on the job')) return 'OJT';
+    if (s.includes('not well trained') && s.includes('not needed')) return 'NWTnn';
+    if (s.includes('well trained') && s.includes('not needed')) return 'WTnn';
+    if (s.includes('positively')) return 'WTpos';
+    return 'OTHER';
+  }
+
+  const AGREE = { 'strongly agree': 6, 'agree': 5, 'somewhat agree': 4, 'neither agree nor disagree': 3.5, 'somewhat disagree': 3, 'disagree': 2, 'strongly disagree': 1 };
+  const AGREE_ORDER = ['Strongly Agree', 'Agree', 'Somewhat Agree', 'Neither agree nor disagree', 'Somewhat Disagree', 'Disagree', 'Strongly Disagree'];
+
+  function normPath(v) {
+    const s = clean(v).toLowerCase();
+    if (!s) return '(blank)';
+    const mac = s.includes('mac');
+    const acs = /\bacs\b/.test(s);
+    if (mac && acs) return 'ORSA-MAC & ACS';
+    if (mac) return 'ORSA-MAC only';
+    if (acs) return 'ACS only';
+    return clean(v);
+  }
+  function normAssign(v) {
+    const s = clean(v).toLowerCase();
+    if (!s) return '(blank)';
+    if (s.includes('large analytic')) return 'Large analytic org';
+    if (s.includes('instructor')) return 'Instructor';
+    if (s.includes('combat')) return 'Combat analyst';
+    if (s.includes('technical')) return 'Technical domain';
+    if (s.includes('staff')) return 'Army/Joint/OSD staff';
+    return clean(v);
+  }
+  const isNA = (s) => /^(n\/?a|none|nothing|no|nil|-+|\.)\b|did not attend|none come to mind|^not sure\.?$/i.test(clean(s)) || clean(s) === '';
+  const splitMulti = (v) => clean(v).split(';').map(clean).filter(Boolean);
+
+  function parseDate(v) {
+    if (v == null || v === '') return null;
+    if (typeof v === 'number' && v > 20000 && v < 80000) {
+      const ms = Math.round((v - 25569) * 86400000);
+      const d = new Date(ms);
+      return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds());
+    }
+    const d = new Date(v);
+    return isNaN(d) ? null : d;
+  }
+  const pad = (n) => String(n).padStart(2, '0');
+  const localISO = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+
+  function fnv(str) {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+    return h.toString(16).padStart(8, '0');
+  }
+
+  /* raw = {cols:[header...], vals:[value...]} with dates already as local ISO strings */
+  function rawKey(raw) {
+    let id = '', start = '';
+    raw.cols.forEach((c, i) => { const r = roleOf(c); if (r === 'id') id = clean(raw.vals[i]); if (r === 'start') start = clean(raw.vals[i]); });
+    const body = start ? id + '|' + start : raw.vals.map(clean).join('|');
+    return 'r-' + fnv(body) + '-' + (id.replace(/[^A-Za-z0-9_-]/g, '').slice(0, 20) || 'x');
+  }
+
+  function normalize(raw, meta) {
+    const r = { key: meta.key, batch: meta.batch || '', source: meta.source || '', skills: {}, skillRaw: {}, acs: [], mac: [], other: {}, issues: [] };
+    raw.cols.forEach((col, i) => {
+      const v = raw.vals[i];
+      const role = roleOf(col);
+      const cv = clean(v);
+      switch (role) {
+        case 'id': r.id = cv; break;
+        case 'start': r.start = parseDate(v); break;
+        case 'end': r.end = parseDate(v); break;
+        case 'skill': { const n = skillName(col); r.skills[n] = codeSkill(v); r.skillRaw[n] = cv; break; }
+        case 'path': r.pathRaw = cv; r.path = normPath(v); break;
+        case 'degree': r.degree = cv || '(blank)'; break;
+        case 'otherField': r.otherField = cv; break;
+        case 'cost': r.cost = cv || '(blank)'; break;
+        case 'school': r.school = cv; break;
+        case 'culminating': r.culminating = cv || '(blank)'; break;
+        case 'acs': r.acsRaw = cv; r.acs = splitMulti(v); break;
+        case 'mac': r.macRaw = cv; r.mac = splitMulti(v); break;
+        case 'add': r.add = cv; break;
+        case 'remove': r.remove = cv; break;
+        case 'agree': r.agree = cv; r.score = AGREE[cv.toLowerCase()] ?? null; break;
+        case 'explain': r.explain = cv; break;
+        case 'assignment': r.assignRaw = cv; r.assignment = normAssign(v); break;
+        case 'pii': case 'ignore': break;
+        default: r.other[clean(col)] = cv;
+      }
+    });
+    r.path = r.path || '(blank)';
+    r.assignment = r.assignment || '(blank)';
+    r.degree = r.degree || '(blank)';
+    r.cost = r.cost || '(blank)';
+    r.culminating = r.culminating || '(blank)';
+    r.minutes = r.start && r.end ? (r.end - r.start) / 60000 : null;
+    r.wave = r.start ? `${r.start.getFullYear()}-${pad(r.start.getMonth() + 1)}` : '(no date)';
+    return r;
+  }
+
+  /* ---- metrics ---- */
+  function skillList(rows) {
+    const seen = [];
+    rows.forEach((r) => Object.keys(r.skills).forEach((k) => { if (!seen.includes(k)) seen.push(k); }));
+    return seen;
+  }
+  function skillStats(rows, skill) {
+    const c = { WTpos: 0, WTnn: 0, OJT: 0, NWTnn: 0, NEG: 0, OTHER: 0 };
+    let n = 0;
+    rows.forEach((r) => { const v = r.skills[skill]; if (v) { c[v]++; n++; } });
+    const trained = c.WTpos + c.WTnn, needed = c.WTpos + c.OJT + c.NEG, gap = c.OJT + c.NEG;
+    return {
+      skill, n, counts: c, trained, needed, gap, unused: c.WTnn, neg: c.NEG,
+      trainedPct: n ? trained / n : null, neededPct: n ? needed / n : null,
+      gapOfNeeded: needed ? gap / needed : null, wtposPct: n ? c.WTpos / n : null,
+    };
+  }
+  function groupStats(rows, skills) {
+    const scored = rows.filter((r) => r.score != null);
+    const sum = scored.reduce((a, r) => a + r.score, 0);
+    let ans = 0, wtpos = 0, gaps = 0;
+    rows.forEach((r) => skills.forEach((k) => { const v = r.skills[k]; if (v) { ans++; if (v === 'WTpos') wtpos++; if (v === 'OJT' || v === 'NEG') gaps++; } }));
+    return {
+      n: rows.length, nScored: scored.length,
+      mean: scored.length ? sum / scored.length : null,
+      top2: scored.length ? scored.filter((r) => r.score >= 5).length / scored.length : null,
+      sa: scored.length ? scored.filter((r) => r.score === 6).length / scored.length : null,
+      nDis: scored.filter((r) => r.score <= 3).length,
+      wtposRate: ans ? wtpos / ans : null,
+      gapsPer: rows.length ? gaps / rows.length : null,
+    };
+  }
+  function groupBy(rows, fn) {
+    const m = new Map();
+    rows.forEach((r) => { const k = fn(r); if (!m.has(k)) m.set(k, []); m.get(k).push(r); });
+    return m;
+  }
+  function median(a) {
+    const s = a.filter((x) => x != null && isFinite(x)).sort((x, y) => x - y);
+    if (!s.length) return null;
+    const h = Math.floor(s.length / 2);
+    return s.length % 2 ? s[h] : (s[h - 1] + s[h]) / 2;
+  }
+  const canonItem = (s) => clean(s).replace(/\s+$/, '');
+  function programStats(rows) {
+    const acsRows = rows.filter((r) => r.acs.length && !r.acs.every(isNA));
+    const macRows = rows.filter((r) => r.mac.length && !r.mac.every(isNA));
+    const items = [];
+    [...acsRows.flatMap((r) => r.acs), ...macRows.flatMap((r) => r.mac)].forEach((x) => { const c = canonItem(x); if (!isNA(c) && !items.includes(c)) items.push(c); });
+    return {
+      nAcs: acsRows.length, nMac: macRows.length,
+      items: items.map((it) => {
+        const a = acsRows.filter((r) => r.acs.map(canonItem).includes(it)).length;
+        const m = macRows.filter((r) => r.mac.map(canonItem).includes(it)).length;
+        return { item: it, acs: a, mac: m, acsPct: acsRows.length ? a / acsRows.length : null, macPct: macRows.length ? m / macRows.length : null };
+      }),
+    };
+  }
+
+  const THEMES = [
+    ['Data engineering, SQL, cloud', /sql|data engineer|database|pipeline|cloud|data connection|etl|\bs3\b|blob|data architect/i],
+    ['Programming and automation', /programm|coding|python|\bR\b|automation|languages/i],
+    ['AI / ML / LLMs', /\bai\b|machine learning|\bml\b|llm|large language|genai|artificial intell/i],
+    ['Agentic AI', /agent/i],
+    ['App development, HTML, web', /\bapps?\b|app dev|html|\bweb\b|front.?end|javascript/i],
+    ['Data visualization, dashboards', /visuali|dashboard/i],
+    ['Communication and teaching', /communicat|teach|brief|writ|present/i],
+    ['Cost-benefit, budget, PPBE', /cost|ppbe|\bpom\b|budget|financ|program management/i],
+    ['Assessments (campaign, ops)', /assessment/i],
+    ['Surveys and data collection', /survey|questionnaire|data collection|sampling/i],
+    ['Modeling and simulation', /simulat|modeling|modelling/i],
+    ['Big data', /big data/i],
+    ['Statistics', /statistic/i],
+  ];
+  function themeHits(text) { return THEMES.filter(([, re]) => re.test(text || '')).map(([n]) => n); }
+
+  function qualityChecks(rows) {
+    const out = [];
+    const add = (title, detail, list) => out.push({ title, detail, ids: list.map((r) => r.id || r.key) });
+    const keys = groupBy(rows, (r) => r.key);
+    add('Duplicate responses (same ID and start time)', 'Counted once in the shared dataset; listed if a single upload repeats them.', [...keys.values()].filter((g) => g.length > 1).map((g) => g[0]));
+    add('Completed in under 1 minute', 'Possible test or careless submissions.', rows.filter((r) => r.minutes != null && r.minutes < 1));
+    add('Same answer on every skill question', 'Possible straight-lining.', rows.filter((r) => { const v = Object.values(r.skills).filter(Boolean); return v.length > 2 && new Set(v).size === 1; }));
+    add('ACS graduate with the “ACS prepared me” question blank', 'Usually survey skip logic (in the 2024–25 survey, every NPS and AFIT graduate).', rows.filter((r) => /acs/i.test(r.path) && !r.acs.length));
+    add('Attended ORSA-MAC but answered “did not attend”', 'Contradictory answers.', rows.filter((r) => /mac/i.test(r.path) && r.mac.length && r.mac.every(isNA)));
+    add('ACS only but rated ORSA-MAC preparation', 'Contradictory answers.', rows.filter((r) => r.path === 'ACS only' && r.mac.some((x) => !isNA(x))));
+    add('No overall preparation rating', 'Excluded from agreement averages.', rows.filter((r) => r.score == null));
+    add('Unrecognized skill answer text', 'A skill answer did not match any of the five standard choices.', rows.filter((r) => Object.values(r.skills).includes('OTHER')));
+    const costSchools = rows.filter((r) => r.cost && r.cost !== '(blank)' && r.cost !== 'None' && !/\$|cost/i.test(r.cost));
+    add('School name recorded in the cost-category column', 'The cost question mixes cost bands with school names (NPS, AFIT).', costSchools);
+    add('No start date', 'Cannot be placed in a survey wave.', rows.filter((r) => !r.start));
+    return out;
+  }
+
+  function findings(rows) {
+    const out = [];
+    if (!rows.length) return out;
+    const skills = skillList(rows);
+    const g = groupStats(rows, skills);
+    const pct = (x) => (x == null ? '–' : Math.round(x * 100) + '%');
+    out.push(`${pct(g.top2)} of ${g.nScored} respondents agree or strongly agree that their training prepared them for their first ORSA assignment; ${g.nDis} disagree at some level.`);
+    const ss = skills.map((k) => skillStats(rows, k)).filter((s) => s.n);
+    if (ss.length) {
+      const most = [...ss].sort((a, b) => b.neededPct - a.neededPct)[0];
+      out.push(`Most needed skill: ${most.skill} (${pct(most.neededPct)} of officers needed it in their first job).`);
+      const gaps = ss.filter((s) => s.needed >= 5).sort((a, b) => b.gapOfNeeded - a.gapOfNeeded);
+      if (gaps.length) out.push(`Largest training gap: ${gaps[0].skill}. ${gaps[0].gap} of the ${gaps[0].needed} officers who needed it were not trained (${pct(gaps[0].gapOfNeeded)}).`);
+      const over = [...ss].sort((a, b) => b.unused - a.unused)[0];
+      out.push(`Most over-taught skill: ${over.skill}. ${over.unused} officers were well trained in it but never needed it.`);
+      const neg = ss.reduce((a, s) => a + s.neg, 0);
+      if (neg) out.push(`${neg} skill answers say a training gap hurt job performance.`);
+    }
+    const byA = [...groupBy(rows, (r) => r.assignment)].map(([k, rs]) => ({ k, ...groupStats(rs, skills) })).filter((x) => x.nScored >= 5 && x.k !== '(blank)').sort((a, b) => b.mean - a.mean);
+    if (byA.length >= 2) out.push(`By first assignment (groups of 5+): ${byA[0].k} most satisfied (${byA[0].mean.toFixed(1)} of 6), ${byA[byA.length - 1].k} least (${byA[byA.length - 1].mean.toFixed(1)}).`);
+    const p = programStats(rows);
+    if (p.nAcs >= 5 && p.nMac >= 5) {
+      const d = p.items.map((x) => ({ ...x, d: x.macPct - x.acsPct })).sort((a, b) => Math.abs(b.d) - Math.abs(a.d))[0];
+      if (d) out.push(`Biggest program difference: ${d.item}. ${pct(d.macPct)} of ORSA-MAC graduates vs. ${pct(d.acsPct)} of ACS graduates felt prepared.`);
+    }
+    const waves = [...groupBy(rows.filter((r) => r.start), (r) => r.wave)].sort((a, b) => a[0].localeCompare(b[0]));
+    if (waves.length >= 2) {
+      const f = groupStats(waves[0][1], skills), l = groupStats(waves[waves.length - 1][1], skills);
+      out.push(`Trend: agreement was ${pct(f.top2)} in the first wave (${waves[0][0]}, n=${f.n}) and ${pct(l.top2)} in the latest (${waves[waves.length - 1][0]}, n=${l.n}).`);
+    }
+    return out;
+  }
+
+  return { clean, roleOf, ROLE_LABEL, skillName, codeSkill, CODES, CODE_LABEL, AGREE, AGREE_ORDER, normPath, normAssign, isNA, splitMulti, parseDate, localISO, rawKey, normalize, skillList, skillStats, groupStats, groupBy, median, programStats, THEMES, themeHits, qualityChecks, findings, canonItem };
+})();
+if (typeof module !== 'undefined') module.exports = Core;
+
+</script>
+<script>
+/* ===== UI ===== */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pct = (x) => (x == null || !isFinite(x) ? '–' : Math.round(x * 100) + '%');
+const fix1 = (x) => (x == null || !isFinite(x) ? '–' : x.toFixed(1));
+
+const STANDALONE = !!(typeof window !== 'undefined' && window.ORSA_STANDALONE);
+const S = {
+  files: [],
+  db: null, dbStatus: STANDALONE ? 'standalone' : 'loading', canWrite: null, downloads: null,
+  dbRows: [], dbKeys: new Set(), batches: [], colsSeen: new Map(),
+  sessionRows: [], sessionName: '', pending: null, saving: null,
+  source: STANDALONE ? 'session' : 'shared', filters: { wave: '', path: '', assignment: '' },
+  tab: 'overview', compareDim: 'path', heatMetric: 'gapOfNeeded', trendMetric: 'gapOfNeeded',
+  ftQ: 'add', ftTheme: '', ftSearch: '', ftHide: true, qCol: 'agree', confirmDelete: '',
+};
+
+const TABS = [['overview', 'Overview'], ['trends', 'Trends by wave'], ['skills', 'Skills'], ['compare', 'Compare groups'], ['programs', 'ACS vs. ORSA-MAC'], ['questions', 'Answers by question'], ['text', 'Free text'], ['quality', 'Data quality'], ['uploads', 'Uploads']];
+const DIMS = { path: ['Training path', (r) => r.path], assignment: ['First assignment', (r) => r.assignment], degree: ['Graduate degree', (r) => r.degree], cost: ['Cost category / school', (r) => r.cost], culminating: ['Degree final requirement', (r) => r.culminating], wave: ['Survey wave (month)', (r) => r.wave], batch: ['Upload', (r) => batchName(r.batch)] };
+const METRICS = { gapOfNeeded: 'Needed but not trained (% of those who needed it)', trainedPct: 'Well trained (%)', neededPct: 'Needed in the job (%)', wtposPct: 'Trained, needed and helped (%)' };
+
+function batchName(id) { const b = S.batches.find((x) => x.id === id); return b ? b.file : id ? 'Upload ' + id : 'This session'; }
+function noteCols(raw) { raw.cols.forEach((c) => { const k = Core.clean(c); if (!S.colsSeen.has(k)) S.colsSeen.set(k, Core.roleOf(c)); }); }
+
+/* ---------- data sources ---------- */
+function baseRows() { return S.source === 'session' ? S.sessionRows : S.dbRows; }
+function rows() {
+  const f = S.filters;
+  return baseRows().filter((r) => (!f.wave || r.wave === f.wave) && (!f.path || r.path === f.path) && (!f.assignment || r.assignment === f.assignment));
+}
+function opts(list, cur, all) { return `<option value="">${esc(all)}</option>` + list.map((v) => `<option value="${esc(v)}"${v === cur ? ' selected' : ''}>${esc(v)}</option>`).join(''); }
+const uniq = (a) => [...new Set(a)].sort();
+
+/* ---------- file reading ---------- */
+async function readFile(file) {
+  if (typeof XLSX === 'undefined') throw new Error('The spreadsheet reader did not load. Check your connection and reload the page.');
+  const buf = await file.arrayBuffer();
+  const wb = XLSX.read(buf, { type: 'array', cellDates: true });
+  let best = null;
+  wb.SheetNames.forEach((name) => {
+    const aoa = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1, defval: '', raw: true, blankrows: false });
+    for (let h = 0; h < Math.min(6, aoa.length); h++) {
+      const hdr = aoa[h].map((c) => Core.clean(c));
+      const known = hdr.filter((c) => c && !['other', 'ignore'].includes(Core.roleOf(c))).length;
+      if (known >= 3 && (!best || known > best.known)) best = { name, aoa, h, hdr, known };
+    }
+  });
+  if (!best) throw new Error('No sheet in this file has the survey’s column headings (ID, Start time, the skill questions…).');
+  const keep = best.hdr.map((c, i) => (c && Core.roleOf(c) !== 'pii' ? i : -1)).filter((i) => i >= 0);
+  const dropped = best.hdr.filter((c) => c && Core.roleOf(c) === 'pii');
+  const cols = keep.map((i) => best.hdr[i]);
+  const raws = [];
+  best.aoa.slice(best.h + 1).forEach((row) => {
+    if (!row.some((v) => Core.clean(v instanceof Date ? 'x' : v))) return;
+    const vals = keep.map((i) => {
+      let v = row[i];
+      const role = Core.roleOf(best.hdr[i]);
+      if (role === 'start' || role === 'end') {
+        if (typeof v === 'string' && /^\d{5}(\.\d+)?$/.test(v.trim())) v = Number(v);
+        const d = v instanceof Date ? v : Core.parseDate(v);
+        return d ? Core.localISO(d) : Core.clean(v);
+      }
+      if (v instanceof Date) return Core.localISO(v);
+      return v == null ? '' : String(v);
+    });
+    raws.push({ cols, vals });
+  });
+  return { sheet: best.name, raws, cols, dropped };
+}
+
+async function handleFile(file) {
+  showMsg('');
+  try {
+    const p = await readFile(file);
+    const seen = new Set();
+    const items = p.raws.map((raw) => ({ raw, key: Core.rawKey(raw) }));
+    const fresh = [], dupInFile = [], existing = [];
+    if (STANDALONE) {
+      const have = new Set(S.sessionRows.map((r) => r.key));
+      let added = 0;
+      items.forEach((it) => { if (!have.has(it.key)) { have.add(it.key); noteCols(it.raw); S.sessionRows.push(Core.normalize(it.raw, { key: it.key, batch: file.name })); added++; } });
+      S.files.push({ name: file.name, read: p.raws.length, added });
+      S.sessionName = S.files.map((f) => f.name).join(', ');
+      S.source = 'session';
+      const unk = p.cols.filter((c) => Core.roleOf(c) === 'other');
+      showMsg(`Read ${p.raws.length} responses from ${esc(file.name)}: ${added} added${p.raws.length - added ? `, ${p.raws.length - added} already loaded (skipped)` : ''}.${p.dropped.length ? ' Name and email columns were ignored.' : ''}${unk.length ? ` ${unk.length} unrecognized column(s) appear on “Answers by question”.` : ''}`);
+      render();
+      return;
+    }
+    items.forEach((it) => { if (seen.has(it.key)) dupInFile.push(it); else { seen.add(it.key); (S.dbKeys.has(it.key) ? existing : fresh).push(it); } });
+    S.pending = { file: file.name, ...p, items, fresh, existing, dupInFile };
+    render();
+  } catch (e) { showMsg(esc(e.message || String(e)), true); }
+}
+
+function useSession() {
+  const p = S.pending;
+  const seen = new Set();
+  S.sessionRows = p.items.filter((it) => (seen.has(it.key) ? false : seen.add(it.key))).map((it) => { noteCols(it.raw); return Core.normalize(it.raw, { key: it.key, batch: '' }); });
+  S.sessionName = p.file; S.source = 'session'; S.pending = null; S.filters = { wave: '', path: '', assignment: '' };
+  render();
+}
+
+async function saveShared() {
+  const p = S.pending; if (!S.db || !p) return;
+  const batchId = 'b' + Date.now();
+  const coll = S.db.collection('responses');
+  S.saving = { done: 0, total: p.fresh.length }; renderPending();
+  try {
+    for (const it of p.fresh) {
+      await coll.doc(it.key).set({ cols: it.raw.cols, vals: it.raw.vals, batch: batchId, savedAt: new Date().toISOString() });
+      S.saving.done++; renderPending();
+    }
+    await S.db.collection('batches').doc(batchId).set({ file: p.file, sheet: p.sheet, savedAt: new Date().toISOString(), added: p.fresh.length, alreadySaved: p.existing.length, rowsInFile: p.raws.length });
+    showMsg(`Saved ${p.fresh.length} new responses from ${esc(p.file)}. ${p.existing.length} were already in the shared dataset.`);
+    S.pending = null; S.saving = null; S.source = 'shared';
+  } catch (e) {
+    const why = e && e.code === 'quota_exceeded' ? 'The shared dataset is full. Delete an old upload on the Uploads tab, then try again.' : e && e.code === 'invalid_argument' ? 'You don’t have permission to add to the shared dataset. Ask the owner for Contributor access, or analyze the file without saving.' : 'Saving stopped: ' + esc((e && e.message) || e);
+    showMsg(`${why} ${S.saving ? S.saving.done : 0} responses were saved before it stopped; uploading the same file again adds only the rest.`, true);
+    S.saving = null;
+  }
+  render();
+}
+
+async function deleteBatch(id) {
+  if (!S.db) return;
+  try {
+    const victims = S.dbRows.filter((r) => r.batch === id);
+    for (const r of victims) await S.db.collection('responses').doc(r.key).delete();
+    await S.db.collection('batches').doc(id).delete();
+    showMsg(`Deleted ${victims.length} responses from that upload.`);
+  } catch (e) { showMsg('Delete failed: ' + esc((e && e.message) || e), true); }
+  S.confirmDelete = ''; render();
+}
+
+/* ---------- shared dataset ---------- */
+async function connect() {
+  if (STANDALONE) return;
+  const cl = window.claude;
+  if (!cl || !cl.use) { S.dbStatus = 'off'; render(); return; }
+  try { S.downloads = await cl.use('downloads'); } catch (e) { S.downloads = null; }
+  let db = null;
+  try { db = await cl.use('db'); } catch (e) { db = null; }
+  if (!db) { S.dbStatus = 'off'; render(); return; }
+  S.db = db;
+  try { const u = await cl.use('user'); if (u && u.can) S.canWrite = await u.can('data.write'); } catch (e) { S.canWrite = null; }
+  const timer = setTimeout(() => { if (S.dbStatus === 'loading') { S.dbStatus = 'slow'; render(); } }, 10000);
+  db.collection('responses').onSnapshot((snap) => {
+    if (!snap.metadata.fromCache) clearTimeout(timer);
+    S.dbRows = snap.docs.map((d) => { const x = d.data(); const raw = { cols: x.cols || [], vals: x.vals || [] }; noteCols(raw); return Core.normalize(raw, { key: d.id, batch: x.batch }); });
+    S.dbKeys = new Set(S.dbRows.map((r) => r.key));
+    S.dbStatus = snap.metadata.fromCache ? 'cached' : 'ready';
+    if (!S.sessionRows.length) S.source = 'shared';
+    if (S.pending) { const p = S.pending; p.fresh = []; p.existing = []; const seen = new Set(); p.items.forEach((it) => { if (!seen.has(it.key)) { seen.add(it.key); (S.dbKeys.has(it.key) ? p.existing : p.fresh).push(it); } }); }
+    render();
+  }, () => { clearTimeout(timer); S.dbStatus = 'error'; render(); });
+  db.collection('batches').onSnapshot((snap) => {
+    S.batches = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => String(b.savedAt).localeCompare(String(a.savedAt)));
+    render();
+  }, () => {});
+}
+
+/* ---------- rendering ---------- */
+function showMsg(html, err) { $('msg').innerHTML = html ? `<div class="msg${err ? ' err' : ''}">${html}</div>` : ''; }
+
+function renderStatus() {
+  if (STANDALONE) { $('status').innerHTML = `Loaded: <b>${S.sessionRows.length}</b> responses from <b>${S.files.length}</b> file${S.files.length === 1 ? '' : 's'}<br>Files are read in this browser and never uploaded`; return; }
+  const st = { loading: 'Connecting to the shared dataset…', slow: 'The shared dataset can’t be reached yet. You can still analyze a file.', off: 'Shared dataset unavailable here: files are analyzed in this session only.', error: 'The shared dataset stopped responding. Reload to reconnect.', cached: 'Showing a saved copy while the shared dataset loads…' }[S.dbStatus];
+  $('status').innerHTML = st || `Shared dataset: <b>${S.dbRows.length}</b> responses from <b>${S.batches.length}</b> uploads`;
+}
+
+function renderPending() {
+  const p = S.pending, el = $('pending');
+  if (!p) { el.innerHTML = ''; return; }
+  const roles = new Map(); p.cols.forEach((c) => { const r = Core.roleOf(c); roles.set(r, (roles.get(r) || 0) + 1); });
+  const unk = p.cols.filter((c) => Core.roleOf(c) === 'other');
+  const canSave = S.db && ['ready', 'cached'].includes(S.dbStatus) && S.canWrite !== false;
+  el.innerHTML = `<div class="panel" style="margin-top:14px">
+    <h2>${esc(p.file)}</h2>
+    <p class="note">Sheet “${esc(p.sheet)}”: ${p.raws.length} responses read, <b>${p.fresh.length} new</b>, ${p.existing.length} already in the shared dataset${p.dupInFile.length ? `, ${p.dupInFile.length} repeated inside the file` : ''}. ${roles.get('skill') || 0} skill questions recognized.</p>
+    ${p.dropped.length ? `<p class="note">Not stored: ${p.dropped.map(esc).join(', ')} (names and emails are dropped).</p>` : ''}
+    ${unk.length ? `<p class="note">New or unrecognized columns, kept and shown on “Answers by question”: ${unk.map((c) => '“' + esc(c.slice(0, 90)) + '”').join('; ')}</p>` : ''}
+    ${S.saving ? `<p><b>Saving ${S.saving.done} of ${S.saving.total}…</b> Keep this page open.</p>` : `<div class="row">
+      ${canSave && p.fresh.length ? `<button data-act="save">Save ${p.fresh.length} new responses to the shared dataset</button>` : ''}
+      <button class="ghost" data-act="session">Analyze this file only (don’t save)</button>
+      <button class="ghost" data-act="cancel">Cancel</button></div>
+      ${!canSave ? '<p class="note">Saving needs the shared dataset and Contributor access; you can still analyze the file.</p>' : ''}`}
+  </div>`;
+}
+
+function renderControls() {
+  const base = baseRows();
+  const src = STANDALONE ? '' : `<label class="ctl">Data<select data-set="source">
+      <option value="shared"${S.source === 'shared' ? ' selected' : ''}>Shared dataset (${S.dbRows.length})</option>
+      ${S.sessionRows.length ? `<option value="session"${S.source === 'session' ? ' selected' : ''}>This session: ${esc(S.sessionName)} (${S.sessionRows.length})</option>` : ''}
+    </select></label>`;
+  $('controls').innerHTML = src +
+    `<label class="ctl">Survey wave<select data-set="f.wave">${opts(uniq(base.map((r) => r.wave)), S.filters.wave, 'All waves')}</select></label>` +
+    `<label class="ctl">Training path<select data-set="f.path">${opts(uniq(base.map((r) => r.path)), S.filters.path, 'All paths')}</select></label>` +
+    `<label class="ctl">First assignment<select data-set="f.assignment">${opts(uniq(base.map((r) => r.assignment)), S.filters.assignment, 'All assignments')}</select></label>` +
+    `<span class="note" style="padding-bottom:8px">${rows().length} responses in view</span>`;
+  $('tabs').innerHTML = TABS.map(([k, l]) => `<button data-tab="${k}" class="${S.tab === k ? 'on' : ''}">${l}</button>`).join('');
+}
+
+function render() { renderStatus(); renderPending(); renderControls(); renderTab(); }
+
+function renderTab() {
+  const R = rows();
+  const el = $('content');
+  if (!R.length && S.tab !== 'uploads') {
+    el.innerHTML = `<div class="empty">${baseRows().length ? 'No responses match these filters.' : S.dbStatus === 'loading' ? 'Loading…' : STANDALONE ? 'No survey data loaded. Add a Microsoft Forms export above to begin. The file is read in this browser and is never uploaded anywhere.' : 'No survey data yet. Upload a Microsoft Forms export above to begin.'}</div>`;
+    return;
+  }
+  const f = { overview, trends, skills: skillsTab, compare, programs, questions, text: textTab, quality, uploads }[S.tab];
+  el.innerHTML = f(R);
+  if (S.tab === 'text' && S._focusSearch) { const i = $('ftSearch'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } S._focusSearch = false; }
+}
+
+/* ---------- tabs ---------- */
+function overview(R) {
+  const skills = Core.skillList(R), g = Core.groupStats(R, skills);
+  const waves = uniq(R.map((r) => r.wave)).filter((w) => w !== '(no date)');
+  const dist = Core.AGREE_ORDER.map((a) => [a, R.filter((r) => (r.agree || '').toLowerCase() === a.toLowerCase()).length]).filter(([, n]) => n);
+  const max = Math.max(1, ...dist.map(([, n]) => n));
+  const F = Core.findings(R);
+  const count = (fn) => [...Core.groupBy(R, fn)].sort((a, b) => b[1].length - a[1].length).map(([k, v]) => `<tr><td>${esc(k)}</td><td class="num">${v.length}</td></tr>`).join('');
+  return `<div class="kpis">
+      <div class="kpi"><div class="v">${R.length}</div><div class="l">responses</div></div>
+      <div class="kpi"><div class="v">${waves.length}</div><div class="l">survey waves${waves.length ? ` (${esc(waves[0])} to ${esc(waves[waves.length - 1])})` : ''}</div></div>
+      <div class="kpi"><div class="v">${pct(g.top2)}</div><div class="l">agree or strongly agree training prepared them</div></div>
+      <div class="kpi"><div class="v">${fix1(Core.median(R.map((r) => r.minutes)))}</div><div class="l">median minutes to complete</div></div>
+    </div>
+    <div class="grid2">
+      <div class="panel"><h2>Key findings</h2><ul class="findings">${F.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+        <div class="row"><button class="ghost" data-act="copyF">Copy findings</button>${S.downloads || STANDALONE ? '<button class="ghost" data-act="csv">Download summary (CSV)</button>' : '<button class="ghost" data-act="copyCsv">Copy summary as CSV</button>'}<span class="note" id="copyNote"></span></div></div>
+      <div class="panel"><h2>“My training and education prepared me”</h2>
+        <table>${dist.map(([a, n]) => `<tr><td style="width:40%">${esc(a)}</td><td><div class="bar"><span style="width:${(n / max) * 100}%"></span></div></td><td class="num">${n}</td></tr>`).join('')}</table>
+        <p class="note">Average ${fix1(g.mean)} on a 6-point scale (6 = strongly agree). ${pct(g.sa)} strongly agree.</p></div>
+      <div class="panel"><h2>Training path</h2><table>${count((r) => r.path)}</table></div>
+      <div class="panel"><h2>First assignment</h2><table>${count((r) => r.assignment)}</table></div>
+    </div>`;
+}
+
+function metricSelect(key) { return `<select data-set="${key}">${Object.entries(METRICS).map(([k, l]) => `<option value="${k}"${S[key] === k ? ' selected' : ''}>${l}</option>`).join('')}</select>`; }
+function heatCell(v, n, minN) {
+  if (v == null) return '<td class="cell dim">–</td>';
+  const a = 0.08 + v * 0.8;
+  return `<td class="cell${n < minN ? ' dim' : ''}" style="background:rgba(47,93,124,${a.toFixed(2)});color:${a > 0.5 ? '#F3F1EA' : '#17211C'}" title="n = ${n}">${pct(v)}</td>`;
+}
+
+function trends(R) {
+  const skills = Core.skillList(R);
+  const W = [...Core.groupBy(R, (r) => r.wave)].sort((a, b) => a[0].localeCompare(b[0]));
+  const rowsW = W.map(([w, rs]) => { const g = Core.groupStats(rs, skills); return `<tr><td>${esc(w)}</td><td class="num">${g.n}</td><td class="num">${fix1(g.mean)}</td><td><div class="bar"><span style="width:${(g.top2 || 0) * 100}%"></span></div></td><td class="num">${pct(g.top2)}</td><td class="num">${pct(g.sa)}</td><td class="num">${fix1(g.gapsPer)}</td></tr>`; }).join('');
+  const m = S.trendMetric, base = m === 'gapOfNeeded' ? (s) => s.needed : (s) => s.n;
+  const heat = skills.map((k) => `<tr><td>${esc(k)}</td>${W.map(([, rs]) => { const s = Core.skillStats(rs, k); return heatCell(s[m], base(s), 5); }).join('')}</tr>`).join('');
+  return `<div class="panel"><h2>Overall preparation by wave</h2>
+    <table><tr><th>Wave</th><th class="num">Responses</th><th class="num">Avg. (1–6)</th><th>Agree or strongly agree</th><th class="num"></th><th class="num">Strongly agree</th><th class="num">Skill gaps per officer</th></tr>${rowsW}</table>
+    <p class="note">Waves are the month each response was started. Skill gaps per officer = skills they needed but weren’t trained in.</p></div>
+    <div class="panel"><h2>Skills by wave</h2><div class="row" style="margin-bottom:10px"><label class="ctl">Measure ${metricSelect('trendMetric')}</label></div>
+    <table class="heat"><tr><th>Skill</th>${W.map(([w]) => `<th class="num" style="text-align:center">${esc(w)}</th>`).join('')}</tr>${heat}</table>
+    <p class="note">Faded cells rest on fewer than 5 officers. Darker = higher.</p></div>`;
+}
+
+function skillsTab(R) {
+  const S2 = Core.skillList(R).map((k) => Core.skillStats(R, k));
+  const chart = S2.map((s) => `<tr><td style="width:26%"><b>${esc(s.skill)}</b></td><td><div class="pair"><div class="bar"><span style="width:${(s.trainedPct || 0) * 100}%"></span></div><div class="bar o"><span style="width:${(s.neededPct || 0) * 100}%"></span></div></div></td><td class="num" style="width:22%">${pct(s.trainedPct)} trained, ${pct(s.neededPct)} needed</td></tr>`).join('');
+  const tbl = S2.map((s) => `<tr><td>${esc(s.skill)}</td>${Core.CODES.map((c) => `<td class="num">${s.counts[c]}</td>`).join('')}<td class="num"><b>${s.gap}</b> (${pct(s.gapOfNeeded)})</td><td class="num">${s.unused}</td><td class="num">${s.n}</td></tr>`).join('');
+  return `<div class="panel"><h2>Trained vs. needed</h2>
+    <div class="legend"><span><i class="sw" style="background:var(--blue)"></i>Top bar: well trained in the skill</span><span><i class="sw" style="background:var(--orange)"></i>Bottom bar: the first job needed it</span></div>
+    <table>${chart}</table></div>
+    <div class="panel"><h2>All answers by skill</h2>
+    <div style="overflow-x:auto"><table><tr><th>Skill</th>${Core.CODES.map((c) => `<th class="num">${Core.CODE_LABEL[c]}</th>`).join('')}<th class="num">Needed, not trained</th><th class="num">Trained, not needed</th><th class="num">Answered</th></tr>${tbl}</table></div>
+    <p class="note">Needed = trained and helped + learned on the job + gap hurt performance. The percentage beside “needed, not trained” is of those who needed the skill.</p></div>`;
+}
+
+function compare(R) {
+  const [label, fn] = DIMS[S.compareDim];
+  const skills = Core.skillList(R);
+  const G = [...Core.groupBy(R, fn)].sort((a, b) => b[1].length - a[1].length);
+  const t = G.map(([k, rs]) => { const g = Core.groupStats(rs, skills); return `<tr class="${g.n < 5 ? 'dim' : ''}"><td>${esc(k)}</td><td class="num">${g.n}</td><td class="num">${fix1(g.mean)}</td><td class="num">${pct(g.sa)}</td><td class="num">${g.nDis}</td><td class="num">${pct(g.wtposRate)}</td><td class="num">${fix1(g.gapsPer)}</td></tr>`; }).join('');
+  const m = S.heatMetric, base = m === 'gapOfNeeded' ? (s) => s.needed : (s) => s.n;
+  const heat = skills.map((k) => `<tr><td>${esc(k)}</td>${G.map(([, rs]) => { const s = Core.skillStats(rs, k); return heatCell(s[m], base(s), 5); }).join('')}</tr>`).join('');
+  return `<div class="row" style="margin-bottom:12px"><label class="ctl">Compare by<select data-set="compareDim">${Object.entries(DIMS).map(([k, [l]]) => `<option value="${k}"${S.compareDim === k ? ' selected' : ''}>${l}</option>`).join('')}</select></label></div>
+    <div class="panel"><h2>${esc(label)}</h2>
+    <div style="overflow-x:auto"><table><tr><th>Group</th><th class="num">Responses</th><th class="num">Avg. agreement (1–6)</th><th class="num">Strongly agree</th><th class="num">Disagree</th><th class="num">Skill answers: trained, needed, helped</th><th class="num">Skill gaps per officer</th></tr>${t}</table></div>
+    <p class="note">Faded rows have fewer than 5 responses: treat them as anecdotes.</p></div>
+    <div class="panel"><h2>Skills by ${esc(label.toLowerCase())}</h2><div class="row" style="margin-bottom:10px"><label class="ctl">Measure ${metricSelect('heatMetric')}</label></div>
+    <div style="overflow-x:auto"><table class="heat"><tr><th>Skill</th>${G.map(([k]) => `<th class="num" style="text-align:center">${esc(k)}</th>`).join('')}</tr>${heat}</table></div>
+    <p class="note">Faded cells rest on fewer than 5 officers. Darker = higher.</p></div>`;
+}
+
+function programs(R) {
+  const p = Core.programStats(R);
+  const t = p.items.map((x) => { const d = x.macPct != null && x.acsPct != null ? x.macPct - x.acsPct : null; return `<tr><td>${esc(x.item)}</td><td class="num">${pct(x.acsPct)} <span class="note">(${x.acs})</span></td><td><div class="bar"><span style="width:${(x.acsPct || 0) * 100}%"></span></div></td><td class="num">${pct(x.macPct)} <span class="note">(${x.mac})</span></td><td><div class="bar o"><span style="width:${(x.macPct || 0) * 100}%"></span></div></td><td>${d == null ? '–' : Math.abs(d) < 0.05 ? 'About even' : d > 0 ? 'ORSA-MAC' : 'ACS'}</td></tr>`; }).join('');
+  return `<div class="panel"><h2>Which skills each program prepared officers for</h2>
+    <table><tr><th>Skill</th><th class="num">ACS (n = ${p.nAcs})</th><th></th><th class="num">ORSA-MAC (n = ${p.nMac})</th><th></th><th>Stronger</th></tr>${t}</table>
+    <p class="note">Share of officers who answered each program’s question and picked the skill. ACS graduates who skipped the question (in the 2024–25 survey, all NPS and AFIT graduates) are not counted; see Data quality.</p></div>`;
+}
+
+function questionList(R) {
+  const L = [['agree', 'Overall preparation rating', (r) => [r.agree || '(blank)']], ['assignment', 'First assignment', (r) => [r.assignRaw || '(blank)']], ['path', 'Training path', (r) => [r.pathRaw || '(blank)']], ['degree', 'Graduate degree', (r) => [r.degree]], ['otherField', 'Other approved field', (r) => [r.otherField || '(blank)']], ['cost', 'Cost category / school', (r) => [r.cost]], ['school', 'Graduate school', (r) => [r.school || '(blank)']], ['culminating', 'Degree final requirement', (r) => [r.culminating]], ['acs', 'ACS prepared me for… (each pick)', (r) => (r.acs.length ? r.acs.map(Core.canonItem) : ['(blank)'])], ['mac', 'ORSA-MAC prepared me for… (each pick)', (r) => (r.mac.length ? r.mac.map(Core.canonItem) : ['(blank)'])]];
+  Core.skillList(R).forEach((k) => L.push(['skill:' + k, 'Skill: ' + k, (r) => [r.skills[k] ? Core.CODE_LABEL[r.skills[k]] || r.skillRaw[k] : '(blank)']]));
+  const other = uniq(R.flatMap((r) => Object.keys(r.other)));
+  other.forEach((c) => L.push(['other:' + c, 'New column: ' + c.slice(0, 80), (r) => (r.other[c] && r.other[c].includes(';') ? Core.splitMulti(r.other[c]) : [r.other[c] || '(blank)'])]));
+  return L;
+}
+function questions(R) {
+  const L = questionList(R);
+  const q = L.find((x) => x[0] === S.qCol) || L[0];
+  const c = new Map(); R.forEach((r) => q[2](r).forEach((v) => c.set(v, (c.get(v) || 0) + 1)));
+  const E = [...c].sort((a, b) => b[1] - a[1]);
+  const max = Math.max(1, ...E.map(([, n]) => n));
+  const tooMany = E.length > 40;
+  return `<div class="row" style="margin-bottom:12px"><label class="ctl">Question<select data-set="qCol" style="max-width:520px">${L.map(([k, l]) => `<option value="${esc(k)}"${k === q[0] ? ' selected' : ''}>${esc(l)}</option>`).join('')}</select></label></div>
+    <div class="panel"><h2>${esc(q[1])}</h2>
+    <table><tr><th>Answer</th><th></th><th class="num">Count</th><th class="num">Share</th></tr>${E.slice(0, 40).map(([v, n]) => `<tr><td style="width:46%">${esc(v)}</td><td><div class="bar"><span style="width:${(n / max) * 100}%"></span></div></td><td class="num">${n}</td><td class="num">${pct(n / R.length)}</td></tr>`).join('')}</table>
+    <p class="note">Share is of the ${R.length} responses in view${q[0] === 'acs' || q[0] === 'mac' || q[0].startsWith('other:') ? '; a response can pick several answers' : ''}.${tooMany ? ' Showing the 40 most common answers; free text is easier to read on the Free text tab.' : ''}</p></div>`;
+}
+
+function textQuestions(R) {
+  const L = [['add', 'Skills to add'], ['remove', 'Skills to remove'], ['explain', 'Why they rated their preparation that way']];
+  uniq(R.flatMap((r) => Object.keys(r.other))).forEach((c) => L.push(['other:' + c, c.slice(0, 80)]));
+  return L;
+}
+function textOf(r, q) { return q.startsWith('other:') ? r.other[q.slice(6)] || '' : r[q] || ''; }
+function textTab(R) {
+  const L = textQuestions(R);
+  const q = L.find((x) => x[0] === S.ftQ) ? S.ftQ : 'add';
+  const all = R.map((r) => ({ r, t: textOf(r, q) })).filter((x) => !S.ftHide || !Core.isNA(x.t));
+  const counts = Core.THEMES.map(([n]) => [n, all.filter((x) => Core.themeHits(x.t).includes(n)).length]).filter(([, n]) => n);
+  const s = S.ftSearch.toLowerCase();
+  const shown = all.filter((x) => (!S.ftTheme || Core.themeHits(x.t).includes(S.ftTheme)) && (!s || x.t.toLowerCase().includes(s)));
+  return `<div class="row" style="margin-bottom:6px">
+      <label class="ctl">Question<select data-set="ftQ">${L.map(([k, l]) => `<option value="${esc(k)}"${k === q ? ' selected' : ''}>${esc(l)}</option>`).join('')}</select></label>
+      <label class="ctl">Search<input type="search" id="ftSearch" value="${esc(S.ftSearch)}" placeholder="Word or phrase"></label>
+      <label class="note" style="display:flex;gap:6px;align-items:center;padding-top:16px"><input type="checkbox" data-set="ftHide"${S.ftHide ? ' checked' : ''}> Hide “none” and “N/A” answers</label>
+    </div>
+    <div class="chips"><button class="chip${!S.ftTheme ? ' on' : ''}" data-theme="">All themes</button>${counts.map(([n, c]) => `<button class="chip${S.ftTheme === n ? ' on' : ''}" data-theme="${esc(n)}">${esc(n)} · ${c}</button>`).join('')}</div>
+    <p class="note">${shown.length} of ${all.length} answers. Themes are matched by keywords, so check the quotes before citing counts.</p>
+    ${shown.map(({ r, t }) => `<div class="resp"><div class="meta"><span class="tag">ID ${esc(r.id || '?')}</span><span class="tag">${esc(r.path)}</span><span class="tag">${esc(r.assignment)}</span>${r.agree ? `<span class="tag">${esc(r.agree)}</span>` : ''}<span class="tag">${esc(r.wave)}</span></div>${esc(t) || '<span class="note">(blank)</span>'}</div>`).join('')}`;
+}
+
+function quality(R) {
+  const Q = Core.qualityChecks(R);
+  const cols = [...S.colsSeen];
+  return `<div class="panel"><h2>Checks</h2>${Q.map((q) => `<div class="qc"><div class="n${q.ids.length ? ' hot' : ''}">${q.ids.length}</div><div><b>${esc(q.title)}</b><div class="note">${esc(q.detail)}</div>${q.ids.length ? `<div class="ids">IDs: ${q.ids.slice(0, 60).map(esc).join(', ')}${q.ids.length > 60 ? '…' : ''}</div>` : ''}</div></div>`).join('')}</div>
+    <div class="panel"><h2>How each column was read</h2><p class="note">The page finds questions by their wording, so columns can move. A question it doesn’t recognize still appears on “Answers by question” and “Free text”. Skill questions are picked up automatically, including new ones.</p>
+    <div style="overflow-x:auto"><table><tr><th>Column heading</th><th>Read as</th></tr>${cols.map(([c, r]) => `<tr><td>${esc(c.length > 140 ? c.slice(0, 140) + '…' : c)}</td><td>${esc(r === 'skill' ? 'Skill rating: ' + Core.skillName(c) : Core.ROLE_LABEL[r])}</td></tr>`).join('')}</table></div></div>`;
+}
+
+function uploads() {
+  if (STANDALONE) {
+    return `<div class="panel"><h2>Files loaded</h2>
+      ${S.files.length ? `<table><tr><th>File</th><th class="num">Responses read</th><th class="num">Added (new)</th></tr>${S.files.map((f) => `<tr><td>${esc(f.name)}</td><td class="num">${f.read}</td><td class="num">${f.added}</td></tr>`).join('')}</table>
+      <div class="row" style="margin-top:12px"><button class="ghost" data-act="clearSession">Clear all and start over</button></div>` : '<p class="note">No files loaded yet.</p>'}
+      <p class="note">Nothing is saved: closing or reloading this page clears the data. Add several exports at once to compare them; repeated responses (same ID and start time) are counted once.</p></div>`;
+  }
+  const list = S.batches.map((b) => `<tr><td>${esc(b.file)}</td><td>${esc(String(b.savedAt || '').slice(0, 10))}</td><td class="num">${b.added}</td><td class="num">${b.alreadySaved}</td><td class="num">${S.dbRows.filter((r) => r.batch === b.id).length}</td><td>${S.db && S.canWrite !== false ? (S.confirmDelete === b.id ? `<button class="warn" data-del="${esc(b.id)}">Delete its responses</button> <button class="ghost" data-act="nodel">Keep</button>` : `<button class="ghost" data-ask="${esc(b.id)}">Delete…</button>`) : ''}</td></tr>`).join('');
+  return `<div class="panel"><h2>Uploads in the shared dataset</h2>
+    ${S.batches.length ? `<table><tr><th>File</th><th>Saved</th><th class="num">Added</th><th class="num">Already saved</th><th class="num">In dataset now</th><th></th></tr>${list}</table>` : '<p class="note">Nothing saved yet.</p>'}
+    <p class="note">Everyone who can open this page sees the shared dataset. Deleting an upload removes the responses it added; uploading the file again restores them.</p></div>
+    ${S.sessionRows.length ? `<div class="panel"><h2>This session</h2><p>${esc(S.sessionName)}: ${S.sessionRows.length} responses, not saved. They disappear when you close the page.</p><button class="ghost" data-act="clearSession">Clear</button></div>` : ''}`;
+}
+
+/* ---------- export ---------- */
+function csvSummary(R) {
+  const q = (v) => { const s = String(v == null ? '' : v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const L = [];
+  const skills = Core.skillList(R);
+  L.push(['Section', 'Item', 'Responses', 'Avg agreement (1-6)', 'Agree or strongly agree', 'Strongly agree', 'Skill gaps per officer'].map(q).join(','));
+  const g = Core.groupStats(R, skills);
+  const gl = (sec, k, x) => L.push([sec, k, x.n, fix1(x.mean), pct(x.top2), pct(x.sa), fix1(x.gapsPer)].map(q).join(','));
+  gl('Overall', 'All responses in view', g);
+  ['wave', 'path', 'assignment', 'degree'].forEach((d) => [...Core.groupBy(R, DIMS[d][1])].sort().forEach(([k, rs]) => gl(DIMS[d][0], k, Core.groupStats(rs, skills))));
+  L.push('');
+  L.push(['Skill', 'Answered', 'Trained %', 'Needed %', 'Needed not trained', 'Needed not trained % of needed', 'Trained not needed', 'Hurt performance'].map(q).join(','));
+  skills.forEach((k) => { const s = Core.skillStats(R, k); L.push([k, s.n, pct(s.trainedPct), pct(s.neededPct), s.gap, pct(s.gapOfNeeded), s.unused, s.neg].map(q).join(',')); });
+  L.push('');
+  const p = Core.programStats(R);
+  L.push(['Program skill', `ACS % (n=${p.nAcs})`, `ORSA-MAC % (n=${p.nMac})`].map(q).join(','));
+  p.items.forEach((x) => L.push([x.item, pct(x.acsPct), pct(x.macPct)].map(q).join(',')));
+  L.push('');
+  L.push(q('Key findings'));
+  Core.findings(R).forEach((f) => L.push(q(f)));
+  return L.join('\n');
+}
+async function copyText(t, okMsg) {
+  const n = $('copyNote');
+  try { await navigator.clipboard.writeText(t); if (n) n.textContent = okMsg; } catch (e) { if (n) n.textContent = 'Copy was blocked by the browser.'; }
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', async (e) => {
+  const t = e.target.closest('button,[data-tab],[data-theme]');
+  if (!t) return;
+  if (t.dataset.tab) { S.tab = t.dataset.tab; renderControls(); renderTab(); return; }
+  if (t.dataset.theme !== undefined) { S.ftTheme = t.dataset.theme; renderTab(); return; }
+  if (t.dataset.ask) { S.confirmDelete = t.dataset.ask; renderTab(); return; }
+  if (t.dataset.del) { t.disabled = true; await deleteBatch(t.dataset.del); return; }
+  const a = t.dataset.act;
+  if (a === 'save') { t.disabled = true; await saveShared(); }
+  else if (a === 'session') useSession();
+  else if (a === 'cancel') { S.pending = null; render(); }
+  else if (a === 'nodel') { S.confirmDelete = ''; renderTab(); }
+  else if (a === 'clearSession') { S.sessionRows = []; S.sessionName = ''; S.files = []; S.colsSeen = new Map(); S.source = STANDALONE ? 'session' : 'shared'; S.filters = { wave: '', path: '', assignment: '' }; showMsg(''); render(); }
+  else if (a === 'copyF') copyText(Core.findings(rows()).map((x) => '• ' + x).join('\n'), 'Findings copied.');
+  else if (a === 'copyCsv') copyText(csvSummary(rows()), 'Summary copied; paste it into Excel.');
+  else if (a === 'csv') {
+    const n = $('copyNote');
+    if (STANDALONE) {
+      const url = URL.createObjectURL(new Blob([csvSummary(rows())], { type: 'text/csv' }));
+      const link = document.createElement('a'); link.href = url; link.download = 'orsa-survey-summary.csv';
+      document.body.appendChild(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+      return;
+    }
+    try { await S.downloads.save({ filename: 'orsa-survey-summary.csv', data: csvSummary(rows()) }); if (n) n.textContent = ''; }
+    catch (err) { if (n) n.textContent = 'The download didn’t happen. Use Copy instead.'; }
+  }
+});
+document.addEventListener('change', (e) => {
+  const k = e.target.dataset && e.target.dataset.set;
+  if (!k) return;
+  const v = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+  if (k.startsWith('f.')) S.filters[k.slice(2)] = v;
+  else S[k] = v;
+  if (k === 'source') S.filters = { wave: '', path: '', assignment: '' };
+  if (k === 'ftQ') S.ftTheme = '';
+  render();
+});
+document.addEventListener('input', (e) => { if (e.target.id === 'ftSearch') { S.ftSearch = e.target.value; S._focusSearch = true; renderTab(); } });
+
+const drop = $('drop'), fileIn = $('file');
+drop.addEventListener('click', () => fileIn.click());
+drop.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileIn.click(); } });
+fileIn.addEventListener('change', async () => { const fs = [...fileIn.files]; fileIn.value = ''; for (const f of (STANDALONE ? fs : fs.slice(0, 1))) await handleFile(f); });
+['dragenter', 'dragover'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', async (e) => { const fs = [...e.dataTransfer.files]; for (const f of (STANDALONE ? fs : fs.slice(0, 1))) await handleFile(f); });
+
+render();
+connect();
+
+</script>
+</body>
+</html>
